@@ -5,6 +5,9 @@ import { FarmsRepositoryService } from '../repositories/farms-repository.service
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Farm } from '../entities/farm.entity';
 import { FarmCultivatedCrop } from '../entities/farm-cultivated-crop.entity';
+import { TenantService } from '../../tenant/services/tenant.service';
+import { UsersRepositoryService } from '../../users/repositories/users-repository.service';
+import { User } from '../../users/entities/user.entity';
 
 describe('FarmsController', () => {
   let controller: FarmsController;
@@ -15,6 +18,8 @@ describe('FarmsController', () => {
       providers: [
         FarmsService,
         FarmsRepositoryService,
+        TenantService,
+        UsersRepositoryService,
         {
           provide: getRepositoryToken(Farm),
           useValue: {
@@ -27,6 +32,10 @@ describe('FarmsController', () => {
         },
         {
           provide: getRepositoryToken(FarmCultivatedCrop),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(User),
           useValue: {},
         },
       ],

@@ -17,22 +17,29 @@ export class CultivatedCropsRepositoryService {
     private readonly cultivatedCropRepository: Repository<CultivatedCrop>,
   ) {}
 
-  async create(createCultivatedCropDto: CreateCultivatedCropDto) {
+  async create(
+    userId: number,
+    createCultivatedCropDto: CreateCultivatedCropDto,
+  ) {
     try {
       return await this.cultivatedCropRepository.save({
         ...createCultivatedCropDto,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async findAll(query: {
-    page: number;
-    take: number;
-    name: string;
-    harvestId: number;
-  }) {
+  async findAll(
+    userId: number,
+    query: {
+      page: number;
+      take: number;
+      name: string;
+      harvestId: number;
+    },
+  ) {
     try {
       let { page, take } = query;
       if (!page) page = 0;
@@ -40,7 +47,7 @@ export class CultivatedCropsRepositoryService {
 
       const { name, harvestId } = query;
 
-      let where: any = {};
+      let where: any = { accountId: userId };
 
       if (name) {
         where = { ...where, name: Like(`%${name}%`) };
@@ -62,20 +69,24 @@ export class CultivatedCropsRepositoryService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number, id: number) {
     try {
       return await this.cultivatedCropRepository.findOne({
-        where: { id },
+        where: { id: id, accountId: userId },
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async update(id: number, updateCultivatedCropDto: UpdateCultivatedCropDto) {
+  async update(
+    userId: number,
+    id: number,
+    updateCultivatedCropDto: UpdateCultivatedCropDto,
+  ) {
     try {
       return await this.cultivatedCropRepository.update(
-        { id: id },
+        { id: id, accountId: userId },
         {
           ...updateCultivatedCropDto,
           harvest: { id: updateCultivatedCropDto.harvestId },
@@ -86,10 +97,11 @@ export class CultivatedCropsRepositoryService {
     }
   }
 
-  async remove(id: number) {
+  async remove(userId: number, id: number) {
     try {
       return await this.cultivatedCropRepository.delete({
-        id,
+        id: id,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);

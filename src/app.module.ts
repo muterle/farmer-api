@@ -12,6 +12,7 @@ import { HarvestsModule } from './harvests/harvests.module';
 import { CultivatedCropsModule } from './cultivated-crops/cultivated-crops.module';
 import { CustomLogger } from './shared/logger/custom-logger';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
             },
       cache: true,
     }),
+    TenantModule,
     FarmersModule,
     AuthModule,
     UsersModule,

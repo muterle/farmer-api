@@ -3,6 +3,9 @@ import { CultivatedCropsService } from './cultivated-crops.service';
 import { CultivatedCropsRepositoryService } from '../repositories/cultivated-crops-repository.service';
 import { CultivatedCrop } from '../entities/cultivated-crop.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { TenantService } from '../../tenant/services/tenant.service';
+import { UsersRepositoryService } from '../../users/repositories/users-repository.service';
+import { User } from '../../users/entities/user.entity';
 
 describe('CultivatedCropsService', () => {
   let service: CultivatedCropsService;
@@ -12,6 +15,8 @@ describe('CultivatedCropsService', () => {
       providers: [
         CultivatedCropsService,
         CultivatedCropsRepositoryService,
+        TenantService,
+        UsersRepositoryService,
         {
           provide: getRepositoryToken(CultivatedCrop),
           useValue: {
@@ -21,6 +26,10 @@ describe('CultivatedCropsService', () => {
             update: jest.fn().mockResolvedValue(null),
             remove: jest.fn().mockResolvedValue(null),
           },
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: {},
         },
       ],
     }).compile();

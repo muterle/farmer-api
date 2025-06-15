@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { returnException } from '../../shared/exceptions';
 import { FarmCultivatedCrop } from '../entities/farm-cultivated-crop.entity';
+import { TenantService } from '../../tenant/services/tenant.service';
 
 @Injectable()
 export class FarmsRepositoryService {
@@ -18,25 +19,30 @@ export class FarmsRepositoryService {
     private readonly farmRepository: Repository<Farm>,
     @InjectRepository(FarmCultivatedCrop)
     private readonly farmCultivatedCropRepository: Repository<FarmCultivatedCrop>,
+    private readonly tenantService: TenantService,
   ) {}
 
-  async create(createFarmDto: CreateFarmDto) {
+  async create(userId: number, createFarmDto: CreateFarmDto) {
     try {
       return await this.farmRepository.save({
         ...createFarmDto,
         farmer: { id: createFarmDto.farmerId },
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async findAll(query: {
-    page: number;
-    take: number;
-    name: string;
-    farmerId: number;
-  }) {
+  async findAll(
+    userId: number,
+    query: {
+      page: number;
+      take: number;
+      name: string;
+      farmerId: number;
+    },
+  ) {
     try {
       let { page, take } = query;
       if (!page) page = 0;
@@ -44,7 +50,7 @@ export class FarmsRepositoryService {
 
       const { name, farmerId } = query;
 
-      let where: any = {};
+      let where: any = { accountId: userId };
 
       if (name) {
         where = { ...where, name: Like(`%${name}%`) };
@@ -66,22 +72,22 @@ export class FarmsRepositoryService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number, id: number) {
     try {
       return await this.farmRepository.findOne({
-        where: { id },
+        where: { id: id, accountId: userId },
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async update(id: number, updateFarmDto: UpdateFarmDto) {
+  async update(userId: number, id: number, updateFarmDto: UpdateFarmDto) {
     try {
       await this.farmCultivatedCropRepository.delete({ farm: { id: id } });
 
       return await this.farmRepository.update(
-        { id: id },
+        { id: id, accountId: userId },
         {
           ...updateFarmDto,
           farmer: { id: updateFarmDto.farmerId },
@@ -92,10 +98,11 @@ export class FarmsRepositoryService {
     }
   }
 
-  async remove(id: number) {
+  async remove(userId: number, id: number) {
     try {
       return await this.farmRepository.delete({
-        id,
+        id: id,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);

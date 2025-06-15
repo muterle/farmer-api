@@ -15,6 +15,9 @@ export class Harvest {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
+  @Column({ type: 'bigint', name: 'account_id' })
+  accountId: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 

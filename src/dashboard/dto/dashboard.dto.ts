@@ -1,4 +1,4 @@
-import { CultivatedCrop } from 'src/cultivated-crops/entities/cultivated-crop.entity';
+import { CultivatedCrop } from '../../cultivated-crops/entities/cultivated-crop.entity';
 
 export class DashboardDto {
   totalFarms: number;

@@ -54,6 +54,9 @@ export class Farm {
   )
   cultivatedCrops: FarmCultivatedCrop[];
 
+  @Column({ type: 'bigint', name: 'account_id' })
+  accountId: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 

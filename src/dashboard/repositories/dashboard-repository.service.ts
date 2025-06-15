@@ -16,13 +16,15 @@ export class DashboardRepositoryService {
     private readonly farmRepository: Repository<Farm>,
   ) {}
 
-  async getDashboard() {
+  async getDashboard(userId: number) {
     try {
       const dashboard = new DashboardDto();
 
       dashboard.areaByType = { arableArea: 0, vegetationArea: 0 };
 
-      const farms = await this.farmRepository.find();
+      const farms = await this.farmRepository.find({
+        where: { accountId: userId },
+      });
 
       dashboard.totalFarms = farms.length;
       dashboard.totalHectares = farms.reduce(

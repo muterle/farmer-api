@@ -4,6 +4,9 @@ import { HarvestsService } from '../services/harvests.service';
 import { HarvestsRepositoryService } from '../repositories/harvests-repository.service';
 import { Harvest } from '../entities/harvest.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { TenantService } from '../../tenant/services/tenant.service';
+import { UsersRepositoryService } from '../../users/repositories/users-repository.service';
+import { User } from '../../users/entities/user.entity';
 
 describe('HarvestsController', () => {
   let controller: HarvestsController;
@@ -14,6 +17,8 @@ describe('HarvestsController', () => {
       providers: [
         HarvestsService,
         HarvestsRepositoryService,
+        TenantService,
+        UsersRepositoryService,
         {
           provide: getRepositoryToken(Harvest),
           useValue: {
@@ -23,6 +28,10 @@ describe('HarvestsController', () => {
             update: jest.fn().mockResolvedValue(null),
             remove: jest.fn().mockResolvedValue(null),
           },
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: {},
         },
       ],
     }).compile();

@@ -3,6 +3,7 @@ import { CreateFarmDto } from '../dto/create-farm.dto';
 import { UpdateFarmDto } from '../dto/update-farm.dto';
 import { FarmsRepositoryService } from '../repositories/farms-repository.service';
 import { returnException } from '../../shared/exceptions';
+import { TenantService } from '../../tenant/services/tenant.service';
 
 @Injectable()
 export class FarmsService {
@@ -10,7 +11,10 @@ export class FarmsService {
     timestamp: true,
   });
 
-  constructor(private readonly farmerRepository: FarmsRepositoryService) {}
+  constructor(
+    private readonly farmerRepository: FarmsRepositoryService,
+    private readonly tenantService: TenantService,
+  ) {}
 
   async create(createFarmDto: CreateFarmDto) {
     try {
@@ -26,7 +30,10 @@ export class FarmsService {
         );
       }
 
-      return await this.farmerRepository.create(createFarmDto);
+      return await this.farmerRepository.create(
+        this.tenantService.user.id,
+        createFarmDto,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -39,7 +46,10 @@ export class FarmsService {
     farmerId: number;
   }) {
     try {
-      return await this.farmerRepository.findAll(query);
+      return await this.farmerRepository.findAll(
+        this.tenantService.user.id,
+        query,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -47,7 +57,10 @@ export class FarmsService {
 
   async findOne(id: number) {
     try {
-      return await this.farmerRepository.findOne(id);
+      return await this.farmerRepository.findOne(
+        this.tenantService.user.id,
+        id,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -67,7 +80,11 @@ export class FarmsService {
         );
       }
 
-      return await this.farmerRepository.update(id, updateFarmDto);
+      return await this.farmerRepository.update(
+        this.tenantService.user.id,
+        id,
+        updateFarmDto,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -75,7 +92,7 @@ export class FarmsService {
 
   async remove(id: number) {
     try {
-      return await this.farmerRepository.remove(id);
+      return await this.farmerRepository.remove(this.tenantService.user.id, id);
     } catch (error) {
       returnException(error, this.logger);
     }

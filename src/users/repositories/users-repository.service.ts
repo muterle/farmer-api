@@ -26,14 +26,14 @@ export class UsersRepositoryService {
     }
   }
 
-  async findAll(query: { page: number; take: number }) {
+  async findAll(userId: number, query: { page: number; take: number }) {
     try {
       let { page, take } = query;
       if (!page) page = 0;
       if (!take) take = 10;
 
       const [users, total] = await this.userRepository.findAndCount({
-        where: {},
+        where: { accountId: userId },
         skip: page * take,
         take,
       });
@@ -47,7 +47,7 @@ export class UsersRepositoryService {
   async findOne(id: number) {
     try {
       return await this.userRepository.findOne({
-        where: { id },
+        where: { id: id, accountId: id },
       });
     } catch (error) {
       returnException(error, this.logger);
@@ -64,10 +64,10 @@ export class UsersRepositoryService {
     }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(userId: number, id: number, updateUserDto: UpdateUserDto) {
     try {
       return await this.userRepository.update(
-        { id: id },
+        { id: id, accountId: userId },
         {
           ...updateUserDto,
         },
@@ -78,12 +78,13 @@ export class UsersRepositoryService {
   }
 
   async updatePassword(
+    userId: number,
     id: number,
     updateUserPasswordDto: UpdateUserPasswordDto,
   ) {
     try {
       return await this.userRepository.update(
-        { id: id },
+        { id: id, accountId: userId },
         { password: updateUserPasswordDto.password },
       );
     } catch (error) {
@@ -91,10 +92,11 @@ export class UsersRepositoryService {
     }
   }
 
-  async remove(id: number) {
+  async remove(userId: number, id: number) {
     try {
       return await this.userRepository.delete({
-        id,
+        id: id,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);

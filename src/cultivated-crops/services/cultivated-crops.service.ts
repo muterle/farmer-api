@@ -3,6 +3,7 @@ import { CreateCultivatedCropDto } from '../dto/create-cultivated-crop.dto';
 import { UpdateCultivatedCropDto } from '../dto/update-cultivated-crop.dto';
 import { returnException } from '../../shared/exceptions';
 import { CultivatedCropsRepositoryService } from '../repositories/cultivated-crops-repository.service';
+import { TenantService } from '../../tenant/services/tenant.service';
 
 @Injectable()
 export class CultivatedCropsService {
@@ -12,11 +13,13 @@ export class CultivatedCropsService {
 
   constructor(
     private readonly cultivatedCropsRepository: CultivatedCropsRepositoryService,
+    private readonly tenantService: TenantService,
   ) {}
 
   async create(createCultivatedCropDto: CreateCultivatedCropDto) {
     try {
       return await this.cultivatedCropsRepository.create(
+        this.tenantService.user.id,
         createCultivatedCropDto,
       );
     } catch (error) {
@@ -31,7 +34,10 @@ export class CultivatedCropsService {
     harvestId: number;
   }) {
     try {
-      return await this.cultivatedCropsRepository.findAll(query);
+      return await this.cultivatedCropsRepository.findAll(
+        this.tenantService.user.id,
+        query,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -39,7 +45,10 @@ export class CultivatedCropsService {
 
   async findOne(id: number) {
     try {
-      return await this.cultivatedCropsRepository.findOne(id);
+      return await this.cultivatedCropsRepository.findOne(
+        this.tenantService.user.id,
+        id,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -48,6 +57,7 @@ export class CultivatedCropsService {
   async update(id: number, updateCultivatedCropDto: UpdateCultivatedCropDto) {
     try {
       return await this.cultivatedCropsRepository.update(
+        this.tenantService.user.id,
         id,
         updateCultivatedCropDto,
       );
@@ -58,7 +68,10 @@ export class CultivatedCropsService {
 
   async remove(id: number) {
     try {
-      return await this.cultivatedCropsRepository.remove(id);
+      return await this.cultivatedCropsRepository.remove(
+        this.tenantService.user.id,
+        id,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }

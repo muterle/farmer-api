@@ -3,6 +3,9 @@ import { FarmsRepositoryService } from './farms-repository.service';
 import { Farm } from '../entities/farm.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { FarmCultivatedCrop } from '../entities/farm-cultivated-crop.entity';
+import { TenantService } from '../../tenant/services/tenant.service';
+import { UsersRepositoryService } from '../../users/repositories/users-repository.service';
+import { User } from '../../users/entities/user.entity';
 
 describe('FarmsRepositoryService', () => {
   let service: FarmsRepositoryService;
@@ -11,6 +14,8 @@ describe('FarmsRepositoryService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FarmsRepositoryService,
+        TenantService,
+        UsersRepositoryService,
         {
           provide: getRepositoryToken(Farm),
           useValue: {
@@ -23,6 +28,10 @@ describe('FarmsRepositoryService', () => {
         },
         {
           provide: getRepositoryToken(FarmCultivatedCrop),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(User),
           useValue: {},
         },
       ],

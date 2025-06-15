@@ -6,12 +6,16 @@ import { returnException } from '../../shared/exceptions';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserPasswordDto } from '../dto/update-user-password.dto';
 import { UsersRepositoryService } from '../repositories/users-repository.service';
+import { TenantService } from '../../tenant/services/tenant.service';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name, { timestamp: true });
 
-  constructor(private readonly userRepository: UsersRepositoryService) {}
+  constructor(
+    private readonly userRepository: UsersRepositoryService,
+    private readonly tenantService: TenantService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -26,7 +30,10 @@ export class UsersService {
 
   async findAll(query: { page: number; take: number }) {
     try {
-      return await this.userRepository.findAll(query);
+      return await this.userRepository.findAll(
+        this.tenantService.user.id,
+        query,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -50,7 +57,11 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
-      return await this.userRepository.update(id, updateUserDto);
+      return await this.userRepository.update(
+        this.tenantService.user.id,
+        id,
+        updateUserDto,
+      );
     } catch (error) {
       returnException(error, this.logger);
     }
@@ -61,7 +72,7 @@ export class UsersService {
     updateUserPasswordDto: UpdateUserPasswordDto,
   ) {
     try {
-      return await this.userRepository.update(id, {
+      return await this.userRepository.update(this.tenantService.user.id, id, {
         password: bcrypt.hashSync(updateUserPasswordDto.password, 8),
       });
     } catch (error) {
@@ -71,7 +82,7 @@ export class UsersService {
 
   async remove(id: number) {
     try {
-      return await this.userRepository.remove(id);
+      return await this.userRepository.remove(this.tenantService.user.id, id);
     } catch (error) {
       returnException(error, this.logger);
     }

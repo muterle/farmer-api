@@ -17,17 +17,21 @@ export class HarvestsRepositoryService {
     private readonly harvestRepository: Repository<Harvest>,
   ) {}
 
-  async create(createHarvestDto: CreateHarvestDto) {
+  async create(userId: number, createHarvestDto: CreateHarvestDto) {
     try {
       return await this.harvestRepository.save({
         ...createHarvestDto,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async findAll(query: { page: number; take: number; name: string }) {
+  async findAll(
+    userId: number,
+    query: { page: number; take: number; name: string },
+  ) {
     try {
       let { page, take } = query;
       if (!page) page = 0;
@@ -35,7 +39,7 @@ export class HarvestsRepositoryService {
 
       const { name } = query;
 
-      let where: any = {};
+      let where: any = { accountId: userId };
 
       if (name) {
         where = { ...where, name: Like(`%${name}%`) };
@@ -53,20 +57,20 @@ export class HarvestsRepositoryService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number, id: number) {
     try {
       return await this.harvestRepository.findOne({
-        where: { id },
+        where: { id: id, accountId: userId },
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async update(id: number, updateHarvestDto: UpdateHarvestDto) {
+  async update(userId: number, id: number, updateHarvestDto: UpdateHarvestDto) {
     try {
       return await this.harvestRepository.update(
-        { id: id },
+        { id: id, accountId: userId },
         {
           ...updateHarvestDto,
         },
@@ -76,10 +80,11 @@ export class HarvestsRepositoryService {
     }
   }
 
-  async remove(id: number) {
+  async remove(userId: number, id: number) {
     try {
       return await this.harvestRepository.delete({
-        id,
+        id: id,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);

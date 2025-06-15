@@ -5,6 +5,7 @@ import { Farmer } from '../entities/farmer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { returnException } from '../../shared/exceptions';
+import { TenantService } from '../../tenant/services/tenant.service';
 
 @Injectable()
 export class FarmersRepositoryService {
@@ -15,25 +16,30 @@ export class FarmersRepositoryService {
   constructor(
     @InjectRepository(Farmer)
     private readonly farmerRepository: Repository<Farmer>,
+    private readonly tenantService: TenantService,
   ) {}
 
-  async create(createFarmerDto: CreateFarmerDto) {
+  async create(userId: number, createFarmerDto: CreateFarmerDto) {
     try {
       return await this.farmerRepository.save({
         ...createFarmerDto,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async findAll(query: {
-    page: number;
-    take: number;
-    name: string;
-    documentNumber: string;
-    isActive: boolean;
-  }) {
+  async findAll(
+    userId: number,
+    query: {
+      page: number;
+      take: number;
+      name: string;
+      documentNumber: string;
+      isActive: boolean;
+    },
+  ) {
     try {
       let { page, take } = query;
       if (!page) page = 0;
@@ -41,7 +47,7 @@ export class FarmersRepositoryService {
 
       const { name, documentNumber, isActive } = query;
 
-      let where: any = {};
+      let where: any = { accountId: userId };
 
       if (name) {
         where = { ...where, name: Like(`%${name}%`) };
@@ -67,20 +73,20 @@ export class FarmersRepositoryService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number, id: number) {
     try {
       return await this.farmerRepository.findOne({
-        where: { id },
+        where: { id: id, accountId: userId },
       });
     } catch (error) {
       returnException(error, this.logger);
     }
   }
 
-  async update(id: number, updateFarmerDto: UpdateFarmerDto) {
+  async update(userId: number, id: number, updateFarmerDto: UpdateFarmerDto) {
     try {
       return await this.farmerRepository.update(
-        { id: id },
+        { id: id, accountId: userId },
         {
           ...updateFarmerDto,
         },
@@ -90,10 +96,11 @@ export class FarmersRepositoryService {
     }
   }
 
-  async remove(id: number) {
+  async remove(userId: number, id: number) {
     try {
       return await this.farmerRepository.delete({
-        id,
+        id: id,
+        accountId: userId,
       });
     } catch (error) {
       returnException(error, this.logger);

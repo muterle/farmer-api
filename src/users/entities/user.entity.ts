@@ -36,6 +36,9 @@ export class User {
   @Column('boolean', { name: 'is_active', default: true })
   isActive: boolean;
 
+  @Column({ type: 'bigint', name: 'account_id' })
+  accountId: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
