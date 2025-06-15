@@ -22,7 +22,7 @@ async function bootstrap() {
     .addBearerAuth()
     .setTitle('Asset Control API')
     .setDescription(
-      'Documentação da API a ser utilizada pela plataforma Soft Rental',
+      'Documentação da API a ser utilizada pela plataforma Farmer',
     )
     .setVersion('1.0.0')
     .build();
