@@ -1,6 +1,6 @@
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Projeto em NestJs para cadastro de fazendeiros, fazendas e cultivos
 
 ## Project setup
 
